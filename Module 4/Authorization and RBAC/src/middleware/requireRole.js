@@ -1,4 +1,4 @@
-```javascript
+
 // TODO: Implement the requireRole factory.
 //
 // requireRole(...allowedRoles) must RETURN an Express middleware that:
@@ -41,4 +41,4 @@ module.exports = function requireRole(...allowedRoles) {
     next();
   };
 };
-```
+
