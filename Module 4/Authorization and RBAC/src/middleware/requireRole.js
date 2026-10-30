@@ -1,3 +1,4 @@
+
 // TODO: Implement the requireRole factory.
 //
 // requireRole(...allowedRoles) must RETURN an Express middleware that:
@@ -16,7 +17,28 @@
 
 module.exports = function requireRole(...allowedRoles) {
   return (req, res, next) => {
-    // Replace this pass-through with the real check:
+    // Check if the user is authenticated.
+    if (!req.user) {
+      return res.status(401).json({
+        error: {
+          code: 'UNAUTHENTICATED',
+          message: 'Authentication is required.',
+        },
+      });
+    }
+
+    // Check if the user's role is allowed.
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You do not have permission to access this resource.',
+        },
+      });
+    }
+
+    // User is authenticated and has an allowed role.
     next();
   };
 };
+

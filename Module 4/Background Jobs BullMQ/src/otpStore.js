@@ -30,24 +30,47 @@
 //    already-expired OTP, since there's no other way to fast-forward time.
 //    Without this export, Test 6 fails even with a correct verifyOTP().
 
-// TODO: implement
-
 const store = new Map();
 
 function generateOTP() {
-  throw new Error('not implemented');
+  return String(Math.floor(100000 + Math.random() * 900000));
 }
 
 function storeOTP(email, otp) {
-  throw new Error('not implemented');
+  store.set(email, {
+    otp: String(otp),
+    expiresAt: Date.now() + 10 * 60 * 1000,
+    attempts: 0
+  });
 }
 
 function verifyOTP(email, code) {
-  throw new Error('not implemented');
+  const entry = store.get(email);
+
+  if (!entry) {
+    return { ok: false, reason: 'not_found' };
+  }
+
+  if (Date.now() >= entry.expiresAt) {
+    store.delete(email);
+    return { ok: false, reason: 'expired' };
+  }
+
+  if (entry.attempts >= 3) {
+    return { ok: false, reason: 'too_many_attempts' };
+  }
+
+  if (String(code) !== entry.otp) {
+    entry.attempts++;
+    return { ok: false, reason: 'wrong_code' };
+  }
+
+  store.delete(email);
+  return { ok: true };
 }
 
 function markVerified(email) {
-  throw new Error('not implemented');
+  console.log(`Email verified: ${email}`);
 }
 
 module.exports = { generateOTP, storeOTP, verifyOTP, markVerified, _store: store };
